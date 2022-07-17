@@ -37,9 +37,23 @@ const resolvers = {
       const token = signToken(user);
       return { token, user };
     },
-    saveBook: async (parent, {user, body}) => {
+    saveBook: async (parent, args) => {
       console.log(user);
-
+      const updatedUser = await User.findOneAndUpdate(
+        { username: user.username },
+        { $addToSet: { savedBooks: body } },
+        { new: true, runValidators: true }
+      );
+      return { updatedUser };
+    },
+    removeBook: async (parent, {user, params}) => {
+      console.log(user);
+      const updatedUser = await User.findOneAndUpdate(
+        { _id: user._id },
+        { $pull: { savedBooks: { bookId: params.bookId } } },
+        { new: true }
+      );
+      return { updatedUser };
     }
   }
 };
